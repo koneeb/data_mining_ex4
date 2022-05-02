@@ -577,4 +577,4 @@ color of the labels is partitioned by Modularity Class. The paritioing
 seems intuitive for the most part with a few exceptions like roots
 vegetables being separate from other vegetables.
 
-<img src="/Users/kapsha/Desktop/repos/data_mining_ex4/code/gephi_NA.png" width="851" />
+![](data_mining_ex4_files/figure-markdown_strict/gephi_NA.png)
