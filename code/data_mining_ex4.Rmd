@@ -1,0 +1,568 @@
+---
+title: 'ECO395M: Exercise 4'
+author: 'Kashaf Oneeb'
+date: '4/25/2022'
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1: Clustering and PCA
+
+### Data Wrangling
+
+To begin, I made a few plots to see if clear clusters are present in the data in terms of color and quality.
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+# Run both PCA and a clustering algorithm of your choice on the 11 chemical properties (or suitable transformations thereof) and summarize your results. Which dimensionality reduction technique makes more sense to you for this data? Convince yourself (and me) that your chosen method is easily capable of distinguishing the reds from the whites, using only the 'unsupervised' information contained in the data on chemical properties. Does your unsupervised technique also seem capable of distinguishing the higher from the lower quality wines?
+# 
+# To clarify: I'm not asking you to run an supervised learning algorithms. Rather, I'm asking you to see whether the differences in the labels (red/white and quality score) emerge naturally from applying an unsupervised technique to the chemical properties. This should be straightforward to assess using plots.
+library(here)
+library(tidyverse)
+library(LICORS)  # for kmeans++
+library(foreach)
+library(mosaic)
+library(factoextra)
+
+
+here::i_am('code/data_mining_ex4.Rmd')
+
+# read in the data
+wine_ <- read.csv(here('data/wine.csv'))
+
+# exclude missing values
+wine <- na.exclude(wine_)
+
+```
+
+#### Color
+
+As shown in the plots below, there seem to be relatively clear clusters for the two colors. The more distinct clusters are observed in the plots of total sulfur dioxide vs. fixed acidity, and total sulfur dioxide vs. chlorides, suggesting that these features play a vital roles in determining the color of the wine.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+# plots by color
+qplot(fixed.acidity, chlorides , data=wine, color=color)
+qplot(fixed.acidity, total.sulfur.dioxide , data=wine, color=color)
+qplot(sulphates, chlorides, data=wine, color=color)
+qplot(volatile.acidity, residual.sugar, data=wine, color=color)
+qplot(chlorides, total.sulfur.dioxide , data=wine, color=color)
+```
+
+#### Quality
+
+On the other hand, the quality clusters are not easily distinguishable as seen below. The most distinct clustering is observed in the alcohol vs. sulphates plot, which is not very distinct. The rest of the plots reflect that clear clustering is not observed for quality in the observed feature space.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# plots by quality
+qplot(fixed.acidity, total.sulfur.dioxide , data=wine, color=factor(quality))
+qplot(chlorides, total.sulfur.dioxide, data=wine, color=factor(quality))
+qplot(sulphates, chlorides, data=wine, color=factor(quality))
+qplot(sulphates, alcohol, data=wine, color=factor(quality))
+qplot(sulphates, residual.sugar, data=wine, color=factor(quality))
+```
+
+### Clustering: kmeans++
+
+#### Choosing k
+
+After observing the patterns in the data, I decided to peform kmeans++ clustering after scaling the 11 features. To choose the optimal k, I plotted the Total Within Sum of Square against the number of clusters. Since it is not very obvious that which value of k would be "optimal", I decided to test three different values of k from the plot i.e. 2, 3, and 7. I chose 2 becuase it is known that we have two clusters for coloring, which was also obvious in the data wrangling plots above. I chose 3 as the Total Within Sum of Squares plot seems to settle down beyond this point. Lastly, I chose 7 as it seemed to have the most relatively stable Total Within Sum of Square value in the plot below, and there are 7 wine quality types.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# center and scale the data
+X <- wine[, (1:11)]
+X <- scale(X, center=TRUE, scale=TRUE)
+
+# extract the centers and scales from the rescaled data 
+mu <- attr(X,'scaled:center')
+sigma <- attr(X,'scaled:scale')
+
+# choose suitable k
+fviz_nbclust(X, kmeans, method = 'wss')
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# using kmeans++ initialization
+clust2 <- kmeanspp(X, k=2, nstart=25)
+
+clust3 <- kmeanspp(X, k=3, nstart=25)
+
+clust7 <- kmeanspp(X, k=7, nstart=25)
+
+```
+
+#### Testing clustering performance: Rand Index
+
+I decided to test the clustering performance based on the Rand Index for the clusters for each value of k, and the actual color and quality labels. The Rand Index measures the similarity of points between two clusters. The calculated values for each k, against actual color and quality are shown below. It can be seen that for color, k=2 performed the best as it has the highest Rand Index of 0.972, which is quite high as the Rand Index ranges from 0 to 1, with higher values reflecting higher similairities between clusters. As for quality, k=7 resulted in the highest Rand Index of 0.625. Although, it is the highest among the three, it is not high enough as there are only 62% similarities between the actual quality clusters and the kmeans++ clusters. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+library(fossil)
+
+actual_color <- as.numeric(as.factor(wine$color))
+actual_quality <- wine$quality
+
+# rand index:comparison of kmeans with original colors
+print('Rand Index for color')
+cat('Rand Index for k=2:', rand.index(actual_color,clust2$cluster), '\n')
+cat('Rand Index for k=3:', rand.index(actual_color,clust3$cluster), '\n')
+cat('Rand Index for k=7:', rand.index(actual_color,clust7$cluster), '\n')
+
+print('Rand Index for quality')
+cat('Rand Index for k=2:', rand.index(actual_quality,clust2$cluster), '\n')
+cat('Rand Index for k=3:', rand.index(actual_quality,clust3$cluster), '\n')
+cat('Rand Index for k=7:', rand.index(actual_quality,clust7$cluster), '\n')
+
+
+
+```
+
+I thought it would be insightful to observe the feature differences between the two clusters for k=2. It seems like the two colors mainly differ in terms of free sulfur dioxide, total sulfure dioxide, and residual sugar.
+
+#### Cluster 1
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+(clust2$center[1,]*sigma + mu) %>% round(1)
+```
+
+#### Cluster 2
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+(clust2$center[2,]*sigma + mu) %>% round(1)
+```
+
+#### Plots for k=2 (color)
+
+To perform a visual test on cluster similarity between kmeans++ and the actual color cluster, I plotted the same plots from the wrangling section using the k=2 clusters. It can be seen that the plots are almost identical, which confirms that kmeans++ with k=2 is the ideal choice for distinguishing red wines from white wines.
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# a few plots with cluster membership shown
+qplot(fixed.acidity, chlorides , data=wine, color=factor(clust2$cluster)) 
+qplot(fixed.acidity, total.sulfur.dioxide , data=wine, color=factor(clust2$cluster))
+qplot(sulphates, chlorides, data=wine, color=factor(clust2$cluster))
+qplot(volatile.acidity, residual.sugar, data=wine, color=factor(clust2$cluster))
+qplot(chlorides, total.sulfur.dioxide , data=wine, color=factor(clust2$cluster))
+```
+
+#### Plots for k=7 (quality)
+
+Likewise, I plotted the same plots from the wrangling section to test the similarities between the kmeans++ clusters and the actual quality clusters. It can be seen that the plots barely compare, therefore, as suggested by the Rand Index, kmeans++ is not an ideal candidate for distinguishing quality. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# a few plots with cluster membership shown
+qplot(fixed.acidity, total.sulfur.dioxide , data=wine, color=factor(clust7$cluster))
+qplot(sulphates, chlorides, data=wine, color=factor(clust7$cluster))
+qplot(volatile.acidity, residual.sugar, data=wine, color=factor(clust7$cluster))
+qplot(chlorides, total.sulfur.dioxide , data=wine, color=factor(clust7$cluster))
+```
+
+
+
+### Prinicpal Component Analysis (PCA)
+
+The next technique utilized to distinguish color and quality is the Principal Component Analysis. I began by scaling the features. To choose the number of components, I plotted the Proportion of Variance Explained and the Cumulative Proportion of Variance Explained by each component. I tested out three values for the number of components i.e. 2, 6, and 8. I chose 2 for the same reasons I chose k=2 in kmeans++. I chose 6 and 8, since they capture at least 80% and 90% of the variance, respectively. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# calculate the proportion of variance explained for the number of principal components
+
+pca_out <- prcomp(X, scale = TRUE)
+
+pca_var <- pca_out$sdev^2
+
+pve <- pca_var/sum(pca_var)
+
+plot(pve, xlab='Principal Component', ylab='Proportion of Variance Explained', ylim=c(0,1),
+     type='b')
+
+plot(cumsum(pve), xlab='Principal Component', ylab='Cumulative Proportion of Variance Explained', 
+     ylim=c(0,1),type='b')
+
+
+```
+
+#### Testing PCA performance: Rand Index
+
+I used the Rand Index to evaluate the three different ranks for color and quality.
+
+#### PCA with rank=2
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# PCA with rank 2
+pca2 = prcomp(X, scale=TRUE, rank=2)
+loadings <- pca2$rotation
+scores <- pca2$x
+
+
+print('Rand Index for color')
+cat('RI for component 1:', rand.index(actual_color,scores[,1]),'\n')
+cat('RI for component 2:', rand.index(actual_color,scores[,2]),'\n')
+print('Rand Index for quality')
+cat('RI for component 1:', rand.index(actual_quality,scores[,1]),'\n')
+cat('RI for component 2:', rand.index(actual_quality,scores[,2]),'\n')
+
+```
+
+#### PCA with rank=6
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# PCA with rank 6
+pca6 = prcomp(X, scale=TRUE, rank=6)
+loadings6 <- pca6$rotation
+scores6 <- pca6$x
+
+print('Rand Index for color')
+cat('RI for component 1:',rand.index(actual_color,scores6[,1]),'\n')
+cat('RI for component 2:',rand.index(actual_color,scores6[,2]),'\n')
+cat('RI for component 3:',rand.index(actual_color,scores6[,3]),'\n')
+cat('RI for component 4:',rand.index(actual_color,scores6[,4]),'\n')
+cat('RI for component 5:',rand.index(actual_color,scores6[,5]),'\n')
+cat('RI for component 6:',rand.index(actual_color,scores6[,6]),'\n')
+print('Rand Index for quality')
+cat('RI for component 1:',rand.index(actual_quality,scores6[,1]),'\n')
+cat('RI for component 2:',rand.index(actual_quality,scores6[,2]),'\n')
+cat('RI for component 3:',rand.index(actual_quality,scores6[,3]),'\n')
+cat('RI for component 4:',rand.index(actual_quality,scores6[,4]),'\n')
+cat('RI for component 5:',rand.index(actual_quality,scores6[,5]),'\n')
+cat('RI for component 6:',rand.index(actual_quality,scores6[,6]),'\n')
+
+
+```
+
+#### PCA with rank=8
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# PCA with rank 8
+pca8 = prcomp(X, scale=TRUE, rank=8)
+loadings8 <- pca8$rotation
+scores8 <- pca8$x
+print('Rand Index for color')
+cat('RI for component 1:',rand.index(actual_color,scores8[,1]),'\n')
+cat('RI for component 2:',rand.index(actual_color,scores8[,2]),'\n')
+cat('RI for component 3:',rand.index(actual_color,scores8[,3]),'\n')
+cat('RI for component 4:',rand.index(actual_color,scores8[,4]),'\n')
+cat('RI for component 5:',rand.index(actual_color,scores8[,5]),'\n')
+cat('RI for component 6:',rand.index(actual_color,scores8[,6]),'\n')
+cat('RI for component 7:',rand.index(actual_color,scores8[,7]),'\n')
+cat('RI for component 8:',rand.index(actual_color,scores8[,8]),'\n')
+print('Rand Index for quality')
+cat('RI for component 1:',rand.index(actual_quality,scores8[,1]),'\n')
+cat('RI for component 2:',rand.index(actual_quality,scores8[,2]),'\n')
+cat('RI for component 3:',rand.index(actual_quality,scores8[,3]),'\n')
+cat('RI for component 4:',rand.index(actual_quality,scores8[,4]),'\n')
+cat('RI for component 5:',rand.index(actual_quality,scores8[,5]),'\n')
+cat('RI for component 6:',rand.index(actual_quality,scores8[,6]),'\n')
+cat('RI for component 7:',rand.index(actual_quality,scores8[,7]),'\n')
+cat('RI for component 8:',rand.index(actual_quality,scores8[,8]),'\n')
+
+
+```
+
+It can be seen that none of the ranks perform as good as kmeans++ in terms of color which has a Rand Index of 0.972, whereas the highest Rand Index for color among all of the PCA ranks is only 0.54. As for quality, the PCA performs the same as kmeans++ across all ranks, with the highest Rand Index for quality being 0.624. As seen in the kmeans++ section, the highest Rand Index achieved for k=7 was 0.625. Therefore, neither kmeans++ nor PCA were able to distinguish quality very well. This could possibly be attributed to the lack of distinct clustering in the original data in terms of quality.
+
+#### PCA plots for rank 2
+
+Although, PCA did not perform as well as kmeans++ in terms of distinguishing colors, the plots below show that the color clusters are much more distinct than the quality clusters. The biplot below shows details about the two components. It is clear that PC1 has higher weights for free sulphur dioxide, total sulfur dioxide, and residual sugar, which were also the features that distinguised color in kmeans++.
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+qplot(scores[,1], scores[,2], color=factor(wine$color), xlab='Component 1', ylab='Component 2')
+qplot(scores[,1], scores[,2], color=factor(wine$quality), xlab='Component 1', ylab='Component 2')
+
+biplot(pca2, scale=0.5)
+
+
+```
+
+## Problem 2: Market Segmentation
+
+Firstly, I observed the distibution of the categorical features by constructing box plots of each feature. I noticed that spam and adult were mostly outliers. Furthermore, spam and adult users would not be the ideal target market for the drink, therfore, I deemed it fit to remove these two features from the analysis.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+library(ggcorrplot)
+
+# read in the data
+mkt_ <- read.csv(here('data/social_marketing.csv'))
+
+# exclude missing values
+mkt <- na.exclude(mkt_)
+
+# make box plots of all features
+oldpar = par(mfrow = c(2,6))
+for ( i in 2:37 ) {
+  boxplot(mkt[[i]])
+  mtext(names(mkt)[i], cex = 0.8, side = 1, line = 2)
+}
+par(oldpar)
+
+# distance <- get_dist(mkt)
+# fviz_dist(distance, gradient = list(low = '#00AFBB', mid = 'white', high = '#FC4E07'))
+
+# drop features that are mostly outliers
+drop <- c('spam','adult')
+  
+mkt <- mkt[,!(names(mkt) %in% drop)]
+
+```
+
+### kmeans++
+
+The first technique utilized is kmeans++ clustering. I scaled the categorical features and plotted the Total Within Sum of Squares against k to get a range of optimal k. As seen below, k ranges from 2 to 10, therefore I created a function to test the optimal value of k based on the Silhoutte score. The Silhouette score measures the goodness of clustering, and ranges from -1 to 1. 1: Means clusters are well apart from each other and clearly distinguished. 0: Means clusters are indifferent. -1: Means clusters are assigned in the wrong way.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# center and scale the data
+X1 <- mkt[, (2:35)]
+X1 = scale(X1, center=TRUE, scale=TRUE) 
+
+# extract the centers and scales from the rescaled data 
+mu <- attr(X1,'scaled:center')
+sigma <- attr(X1,'scaled:scale')
+
+# choose suitable k
+fviz_nbclust(X1, kmeans, method = 'wss')
+```
+
+I plotted the Average Silhoutte score for k between 2 and 10. It can be seen that k=2 and k=3 result in the two highest Silhouette scores.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+library(cluster)
+
+
+# using kmeans++ initialization
+# function to compute average silhouette for k clusters
+avg_sil <- function(k_) {
+  km.res <- kmeanspp(X1, k = k_, nstart = 25)
+  ss <- silhouette(km.res$cluster, dist(X1,  method = 'euclidean'))
+  mean(ss[, 3])
+}
+
+# compute and plot wss for k = 2 to k = 10
+k_.values <- 2:10
+
+# extract avg silhouette for 2-10 clusters
+avg_sil_values <- map_dbl(k_.values, avg_sil)
+
+plot(k_.values, avg_sil_values,
+       type = 'b', pch = 19, frame = FALSE, 
+       xlab = 'Number of clusters K',
+       ylab = 'Average Silhouettes')
+```
+
+The exact scores for k=2 and k=3 are displayed below. Since the two scores are not significantly different, I decided to use k=3 since 3 clusters will result in a little more distcintion amongst the customer segments. 
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+cat('The average silhouette score for k=2:',avg_sil_values[1],'\n')
+cat('The average silhouette score for k=3:',avg_sil_values[2])
+
+
+# summarise results of k=3 kmeans clustering
+kmeans3 <- kmeanspp(X1, k = 3, nstart = 25)
+kmeans_groups3 <- kmeans3$cluster
+```
+
+A summary of the average values for each feature within a cluster are displayed below. The three clusters could be seen as three different market segments. All segments seem to be interested in the following topics: chatter, current events, travel, photo sharing, tv film, sports fandom, politics, food, news, online gaming, shopping, health nutrition, college uni, cooking, automotive, and personal fitness. 
+
+Cluster/Segment 1 seems to be interested in all of the general topics mentioned above but at a much more moderate rate than the other segments. 
+
+Cluster/Segment 2 leans heavily towards sports fandom, food, family, home and garden, parenting, school, crafts, and religion. Therefore, it is reasonable to conclude that this segement represents family-oriented customers, who also care about health and nutrition. 
+
+Cluster/Segment 3 leans heavily towards chatter, travel, photo sharing, tv film, politics, music, online gaming, shopping, health nutrition, college uni, sports playing, cooking, computers, outdoors, automotive, art, beauty, dating, personal fitness, fashion. Therefore, it can be concluded that this segment represents single, young, and possibly college-attending customers. 
+
+The topics that were not as popular among all the segments include, home garden, eco, business, small business. This could mean that the customers not very business or environment oriented althought some of them show interest in these topics. 
+
+Since health nutrition, and personal fitness are directly relatable to NutrientH20, and are topics with a shared interest amongst all segments, the company could focus heavily on these two topics. Sports fandom, online gaming and travel seem to be widely shared interests as well, so focusing on these topics could appeal to the whole audience. If the company is intersted in targeting niche groups, they can focus on family-oriented topics and/or single, yound adults.
+
+Although, the Silhouette score is positive for k=3, it is not as high for a great clustering technique.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+mkt %>%
+  mutate(kmeans_groups3) %>%
+  group_by(kmeans_groups3) %>% 
+  summarise_all('mean')
+
+
+```
+
+### Hierarchical clustering: Ward clustering
+
+The second technique I tried is Hierarchical clustering. I tested all the methods, including complete, ward, single, and average for k=5. I chose the method that resulted in the most balanced clusters. As seen below, method=ward led to the most balanced clusters, therefore, I chose the ward clustering technique.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+# agglomertive hierarchical clustering 
+# form a pairwise distance matrix using the dist function
+mkt_distance_matrix = dist(X1, method='euclidean')
+
+# run agglomerative clustering for complete, single, average
+hier_mkt_complete <- hclust(mkt_distance_matrix, method='complete')
+hier_mkt_ward <- hclust(mkt_distance_matrix, method='ward')
+hier_mkt_single <- hclust(mkt_distance_matrix, method='single')
+hier_mkt_average <- hclust(mkt_distance_matrix, method='average')
+
+ # test balance for k=5 for each method
+complete <- cutree(hier_mkt_complete, k=5)
+ward <- cutree(hier_mkt_ward, k=5)
+single <- cutree(hier_mkt_single, k=5)
+average <- cutree(hier_mkt_average, k=5)
+
+cat('Cluster balance for method=complete', '\n')
+summary(factor(complete))
+cat('Cluster balance for method=ward', '\n')
+summary(factor(ward))
+cat('Cluster balance for method=single', '\n')
+summary(factor(single))
+cat('Cluster balance for method=average', '\n')
+summary(factor(average))
+
+```
+
+#### Choose k
+
+I used the same method as used above in kmeans++ to find the k with the highest Silhoutte score. It can be seen that the highest Silhoutte score is achieved when k=6. However, the y-axis only goes as high as 0.06, which shows that this method performs worse than kmeans++ based on the Silhoutte score.
+
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+
+# function to compute average silhouette for k clusters
+avg_sil1 <- function(k_) {
+  hclust.res <- cutree(hier_mkt_ward, k=k_)
+  ss <- silhouette(hclust.res, mkt_distance_matrix)
+  mean(ss[, 3])
+}
+
+# compute and plot wss for k = 2 to k = 10
+k_.values <- 2:10
+
+# extract avg silhouette for 2-10 clusters
+avg_sil_values1 <- map_dbl(k_.values, avg_sil1)
+
+plot(k_.values, avg_sil_values1,
+       type = 'b', pch = 19, frame = FALSE,
+       xlab = 'Number of clusters K',
+       ylab = 'Average Silhouettes')
+```
+
+I did not explore this technique any further since the average Silhoutte score is so much lower than that of the kmeans++. However, I have displayed the average values for the different clusters below. 
+
+```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
+
+cat('Average silhouette score of kmeans++ with k=2:',avg_sil_values[1], '\n')
+cat('Average silhouette score of ward clustering with k=6:',avg_sil_values1[5])
+
+# summarise results of k=6 agglomerative clustering
+hclust_groups <- cutree(hier_mkt_ward, k=6)
+
+mkt %>%
+  mutate(hclust_groups) %>%
+  group_by(hclust_groups) %>% 
+  summarise_all('mean')
+
+# # plot the dendrogram
+# plot(hier_mkt_ward, cex=0.8, hang=-1)
+```
+
+
+## Problem 3: Association rules for grocery purchases
+
+I chose the following parameters: support = 0.001, and confidence = 0.5. Since support measures how frequently an itemset is in all the transactions, I wanted to consider the itemsets which occur at least 10 times out of a total of 9835 transactions, therefore, I set the support equal to 0.001. I chose a high confidence measure because I wanted to observe itemsets with higher conditional probabilities. Furthermore, since Milk is a very frequent member, I thought having a combination of low support and high confidence could account for the "monopolizing" effect of Milk.
+
+```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
+
+library(arules)  
+library(arulesViz)
+library(igraph)
+
+# read in the data
+groceries <-read.table(here('data/groceries.txt'), sep = '\t', header=FALSE, col.names='basket')
+
+# add index to table
+groceries$customer_id <- 1:nrow(groceries)
+
+# split each basket by comma 
+groceries_list <- strsplit(groceries$basket, ',')
+
+# convert columns to factors
+groceries_list$customer_id <- factor(groceries_list$customer_id)
+groceries_list$basket <- factor(groceries_list$basket)
+
+# de-duplicate grocery lists
+groceries_list <- lapply(groceries_list, unique)
+
+# cast this list as arules transactions class
+groceries_trans <- as(groceries_list, 'transactions')
+
+# run the apriori algorithm
+groceryrules <- apriori(groceries_trans,
+                    parameter=list(support=.001, confidence=.5, maxlen=10),
+                    control = list(verbose = FALSE))
+
+# export a graph
+sub1 <- subset(groceryrules, subset = confidence > 0.25 & support > 0.005)
+saveAsGraph(sub1, file = 'groceryrules.graphml')
+
+# create a dataframe of rules
+
+groceryrules_df <- arules::DATAFRAME(groceryrules)
+lift_10_df <- filter(groceryrules_df,lift>10) %>%
+  arrange(desc(lift))
+
+```
+
+### A table of rules with lift greater than 10
+
+I chose a high lift value to account for itemsets with a high confidence value but weak association amongst items, such as, itemsets containing milk and long life battery products. The table is arranged by lift in descending order. All of these entries seem intuitive and appear to make correct associations. Some entries are straightforward e.g. {baking powder,flour} -> {sugar} or {ham,processed cheese} -> {white bread}, such entries seem to be ingredients for a specific meal. While other entries are more assorted, such as, {other vegetables,rolls/buns,root vegetables,tropical fruit,whole milk} ->{beef} or {sliced cheese,tropical fruit,whole milk,yogurt} -> {butter}, these entries seem to be general grocery items that are needed at all times in a household.
+
+```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
+
+# create table of rules with lift greater than 10
+knitr::kable(lift_10_df, caption = 'Rules with lift greater than 10')
+
+```
+
+### Lift-support-confidence plot
+
+Below is a lift vs. support plot colored by confidence. It can be seen that lift is negatively correlated with support. Also, higher confidence values are observed for higher lift. 
+
+```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
+
+# plot all the rules in (support, lift) space with confidence coloring
+plot(groceryrules, measure = c("support", "lift"), shading = "confidence")
+
+```
+
+### Confidence-support-order plot
+
+Below is a confidence vs. support plot colored by order It can be seen that confidence is negatively correlated with support. 
+
+```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
+
+# "two key" plot: coloring is by size (order) of item set
+plot(groceryrules, method='two-key plot')
+```
+
+### Gephi graph 
+
+Below is a gephi graph for the "Force Atlas" layout with the "NA" values filtered out. The size of the labels is based on Degree, whereas the color of the labels is partitioned by Modularity Class. The paritioing seems intuitive for the most part with a few exceptions like roots vegetables being separate from other vegetables. 
+
+```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
+
+# display gephi graph without NA values
+knitr::include_graphics(here('graphs/gephi_NA.png'))
+```
