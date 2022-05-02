@@ -279,8 +279,8 @@ segments.
 
     ## The average silhouette score for k=3: 0.1828174
 
-A summary of the average values for each feature within a cluster are
-displayed below. The three clusters could be seen as three different
+I examined the summary of the average values for each feature within a cluster. 
+The three clusters could be seen as three different
 market segments. All segments seem to be interested in the following
 topics: chatter, current events, travel, photo sharing, tv film, sports
 fandom, politics, food, news, online gaming, shopping, health nutrition,
@@ -318,19 +318,6 @@ family-oriented topics and/or single, yound adults.
 Although, the Silhouette score is positive for k=3, it is not as high
 for a great clustering technique.
 
-    ## # A tibble: 3 × 36
-    ##   kmeans_groups3     X chatter current_events travel photo_sharing uncategorized
-    ##            <int> <dbl>   <dbl>          <dbl>  <dbl>         <dbl>         <dbl>
-    ## 1              1    NA    6.34           1.84   2.37          4.71         1.18 
-    ## 2              2    NA    4.07           1.70   1.54          2.49         0.735
-    ## 3              3    NA    3.60           1.36   1.25          1.85         0.665
-    ## # … with 29 more variables: tv_film <dbl>, sports_fandom <dbl>, politics <dbl>,
-    ## #   food <dbl>, family <dbl>, home_and_garden <dbl>, music <dbl>, news <dbl>,
-    ## #   online_gaming <dbl>, shopping <dbl>, health_nutrition <dbl>,
-    ## #   college_uni <dbl>, sports_playing <dbl>, cooking <dbl>, eco <dbl>,
-    ## #   computers <dbl>, business <dbl>, outdoors <dbl>, crafts <dbl>,
-    ## #   automotive <dbl>, art <dbl>, religion <dbl>, beauty <dbl>, parenting <dbl>,
-    ## #   dating <dbl>, school <dbl>, personal_fitness <dbl>, fashion <dbl>, …
 
 ### Hierarchical clustering: Ward clustering
 
@@ -371,29 +358,12 @@ Silhoutte score.
 ![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-22-1.png)
 
 I did not explore this technique any further since the average Silhoutte
-score is so much lower than that of the kmeans++. However, I have
-displayed the average values for the different clusters below.
+score is so much lower than that of the kmeans++. 
 
     ## Average silhouette score of kmeans++ with k=2: 0.2151791
 
     ## Average silhouette score of ward clustering with k=6: 0.06463974
 
-    ## # A tibble: 6 × 36
-    ##   hclust_groups     X chatter current_events travel photo_sharing uncategorized
-    ##           <int> <dbl>   <dbl>          <dbl>  <dbl>         <dbl>         <dbl>
-    ## 1             1    NA    3.91           1.51   1.19          2.22         0.867
-    ## 2             2    NA    3.67           1.56   1.08          2.14         0.692
-    ## 3             3    NA    4.80           1.62   1.67          2.57         1.16 
-    ## 4             4    NA    4.87           1.45   1             2.80         0.686
-    ## 5             5    NA    3.88           1.52   4.23          1.96         0.689
-    ## 6             6    NA    4.11           1.73   1.43          5.66         1.18 
-    ## # … with 29 more variables: tv_film <dbl>, sports_fandom <dbl>, politics <dbl>,
-    ## #   food <dbl>, family <dbl>, home_and_garden <dbl>, music <dbl>, news <dbl>,
-    ## #   online_gaming <dbl>, shopping <dbl>, health_nutrition <dbl>,
-    ## #   college_uni <dbl>, sports_playing <dbl>, cooking <dbl>, eco <dbl>,
-    ## #   computers <dbl>, business <dbl>, outdoors <dbl>, crafts <dbl>,
-    ## #   automotive <dbl>, art <dbl>, religion <dbl>, beauty <dbl>, parenting <dbl>,
-    ## #   dating <dbl>, school <dbl>, personal_fitness <dbl>, fashion <dbl>, …
 
 Problem 3: Association rules for grocery purchases
 --------------------------------------------------
@@ -607,4 +577,4 @@ color of the labels is partitioned by Modularity Class. The paritioing
 seems intuitive for the most part with a few exceptions like roots
 vegetables being separate from other vegetables.
 
-<img src="/Users/kapsha/Desktop/repos/data_mining_ex4/graphs/gephi_NA.png" width="851" />
+<img src="/Users/kapsha/Desktop/repos/data_mining_ex4/code/gephi_NA.png" width="851" />

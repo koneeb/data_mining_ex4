@@ -376,7 +376,7 @@ kmeans3 <- kmeanspp(X1, k = 3, nstart = 25)
 kmeans_groups3 <- kmeans3$cluster
 ```
 
-A summary of the average values for each feature within a cluster are displayed below. The three clusters could be seen as three different market segments. All segments seem to be interested in the following topics: chatter, current events, travel, photo sharing, tv film, sports fandom, politics, food, news, online gaming, shopping, health nutrition, college uni, cooking, automotive, and personal fitness. 
+I examined a summary of the average values for each feature within a cluster. The three clusters could be seen as three different market segments. All segments seem to be interested in the following topics: chatter, current events, travel, photo sharing, tv film, sports fandom, politics, food, news, online gaming, shopping, health nutrition, college uni, cooking, automotive, and personal fitness. 
 
 Cluster/Segment 1 seems to be interested in all of the general topics mentioned above but at a much more moderate rate than the other segments. 
 
@@ -391,7 +391,7 @@ Since health nutrition, and personal fitness are directly relatable to NutrientH
 Although, the Silhouette score is positive for k=3, it is not as high for a great clustering technique.
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
-mkt %>%
+sum <-mkt %>%
   mutate(kmeans_groups3) %>%
   group_by(kmeans_groups3) %>% 
   summarise_all('mean')
@@ -459,23 +459,12 @@ plot(k_.values, avg_sil_values1,
        ylab = 'Average Silhouettes')
 ```
 
-I did not explore this technique any further since the average Silhoutte score is so much lower than that of the kmeans++. However, I have displayed the average values for the different clusters below. 
-
+I did not explore this technique any further since the average Silhoutte score is so much lower than that of the kmeans++. 
 ```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
 
 cat('Average silhouette score of kmeans++ with k=2:',avg_sil_values[1], '\n')
 cat('Average silhouette score of ward clustering with k=6:',avg_sil_values1[5])
 
-# summarise results of k=6 agglomerative clustering
-hclust_groups <- cutree(hier_mkt_ward, k=6)
-
-mkt %>%
-  mutate(hclust_groups) %>%
-  group_by(hclust_groups) %>% 
-  summarise_all('mean')
-
-# # plot the dendrogram
-# plot(hier_mkt_ward, cex=0.8, hang=-1)
 ```
 
 
@@ -564,5 +553,5 @@ Below is a gephi graph for the "Force Atlas" layout with the "NA" values filtere
 ```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
 
 # display gephi graph without NA values
-knitr::include_graphics(here('graphs/gephi_NA.png'))
+knitr::include_graphics(here('code/gephi_NA.png'))
 ```
