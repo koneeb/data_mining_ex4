@@ -553,5 +553,5 @@ Below is a gephi graph for the "Force Atlas" layout with the "NA" values filtere
 ```{r echo=FALSE, error=FALSE, message=FALSE, warning=FALSE}
 
 # display gephi graph without NA values
-knitr::include_graphics(here('code/gephi_NA.png'))
+knitr::include_graphics(here('code/data_mining_ex4_files/figure-markdown_strict/gephi_NA.png'))
 ```
