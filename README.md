@@ -17,7 +17,7 @@ of total sulfur dioxide vs. fixed acidity, and total sulfur dioxide
 vs. chlorides, suggesting that these features play a vital roles in
 determining the color of the wine.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-3.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-4.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-5.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-1.png)![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-2.png)![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-3.png)![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-4.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-2-5.png)
 
 #### Quality
 
@@ -27,7 +27,7 @@ vs. sulphates plot, which is not very distinct. The rest of the plots
 reflect that clear clustering is not observed for quality in the
 observed feature space.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-3.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-4.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-5.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-1.png)![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-2.png)![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-3.png)![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-4.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-3-5.png)
 
 ### Clustering: kmeans++
 
@@ -45,7 +45,7 @@ point. Lastly, I chose 7 as it seemed to have the most relatively stable
 Total Within Sum of Square value in the plot below, and there are 7 wine
 quality types.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-4-1.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-4-1.png)
 
 #### Testing clustering performance: Rand Index
 
@@ -112,7 +112,7 @@ section using the k=2 clusters. It can be seen that the plots are almost
 identical, which confirms that kmeans++ with k=2 is the ideal choice for
 distinguishing red wines from white wines.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-3.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-4.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-5.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-3.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-4.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-9-5.png)
 
 #### Plots for k=7 (quality)
 
@@ -122,7 +122,7 @@ clusters. It can be seen that the plots barely compare, therefore, as
 suggested by the Rand Index, kmeans++ is not an ideal candidate for
 distinguishing quality.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-10-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-10-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-10-3.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-10-4.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-10-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-10-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-10-3.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-10-4.png)
 
 ### Prinicpal Component Analysis (PCA)
 
@@ -134,7 +134,7 @@ tested out three values for the number of components i.e. 2, 6, and 8. I
 chose 2 for the same reasons I chose k=2 in kmeans++. I chose 6 and 8,
 since they capture at least 80% and 90% of the variance, respectively.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-11-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-11-2.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-11-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-11-2.png)
 
 #### Testing PCA performance: Rand Index
 
@@ -242,7 +242,7 @@ details about the two components. It is clear that PC1 has higher
 weights for free sulphur dioxide, total sulfur dioxide, and residual
 sugar, which were also the features that distinguised color in kmeans++.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-15-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-15-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-15-3.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-15-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-15-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-15-3.png)
 
 Problem 2: Market Segmentation
 ------------------------------
@@ -253,7 +253,7 @@ were mostly outliers. Furthermore, spam and adult users would not be the
 ideal target market for the drink, therfore, I deemed it fit to remove
 these two features from the analysis.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-16-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-16-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-16-3.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-16-1.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-16-2.png)![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-16-3.png)
 
 ### kmeans++
 
@@ -266,12 +266,12 @@ clustering, and ranges from -1 to 1. 1: Means clusters are well apart
 from each other and clearly distinguished. 0: Means clusters are
 indifferent. -1: Means clusters are assigned in the wrong way.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-17-1.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-17-1.png)
 
 I plotted the Average Silhoutte score for k between 2 and 10. It can be
 seen that k=2 and k=3 result in the two highest Silhouette scores.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-18-1.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-18-1.png)
 
 The exact scores for k=2 and k=3 are displayed below. Since the two
 scores are not significantly different, I decided to use k=3 since 3
@@ -358,7 +358,7 @@ is achieved when k=6. However, the y-axis only goes as high as 0.06,
 which shows that this method performs worse than kmeans++ based on the
 Silhoutte score.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-22-1.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-22-1.png)
 
 I did not explore this technique any further since the average Silhoutte
 score is so much lower than that of the kmeans++. 
@@ -563,14 +563,14 @@ Below is a lift vs. support plot colored by confidence. It can be seen
 that lift is negatively correlated with support. Also, higher confidence
 values are observed for higher lift.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-26-1.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-26-1.png)
 
 ### Confidence-support-order plot
 
 Below is a confidence vs. support plot colored by order It can be seen
 that confidence is negatively correlated with support.
 
-![](data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-27-1.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/unnamed-chunk-27-1.png)
 
 ### Gephi graph
 
@@ -580,4 +580,4 @@ color of the labels is partitioned by Modularity Class. The paritioing
 seems intuitive for the most part with a few exceptions like roots
 vegetables being separate from other vegetables.
 
-![](../graphs/gephi_NA.png)
+![](https://github.com/koneeb/data_mining_ex4/blob/main/code/data_mining_ex4_files/figure-markdown_strict/gephi_NA.png)
