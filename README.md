@@ -1,5 +1,5 @@
 # ECO 395M: Exercise 4
-Solving problems from [Exercise 4] (https://github.com/jgscott/ECO395M/blob/master/exercises/exercises04.md).
+Solving problems from [Exercise 4](https://github.com/jgscott/ECO395M/blob/master/exercises/exercises04.md).
 
 Problem 1: Clustering and PCA
 -----------------------------
@@ -580,4 +580,4 @@ color of the labels is partitioned by Modularity Class. The paritioing
 seems intuitive for the most part with a few exceptions like roots
 vegetables being separate from other vegetables.
 
-![](data_mining_ex4_files/figure-markdown_strict/gephi_NA.png)
+![](../graphs/gephi_NA.png)
